@@ -1,8 +1,8 @@
 const puppeteer = require("puppeteer");
-const { HttpsProxyAgent } = require("https-proxy-agent");
+// const { HttpsProxyAgent } = require("https-proxy-agent");
 
-const fs = require("fs");
-const path = require("path");
+// const fs = require("fs");
+// const path = require("path");
 
 // Get the command-line arguments excluding the first two (node and script path)
 const args = process.argv.slice(2);
@@ -106,5 +106,8 @@ console.log(`DEV_MODE is set to: ${DEV_MODE}`);
   console.log(JSON.stringify(results, null, 2));
 
   await browser.close()
-  process.exit()
+
+  return results
+  
+  // process.exit()
 })();
