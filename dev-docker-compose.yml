@@ -1,0 +1,47 @@
+# version: "3"
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3001:3001
+      - 9229:9229
+    # volumes:
+    #   - ./server:/server
+    # - ./client/public:/client/public
+    command: npm run dev
+    env_file: ./server/.env
+    volumes:
+      - ./server:/server
+    restart: always
+    tty: true
+    networks:
+      - webappnetwork
+      # depends_on:
+      #   - db
+
+  # db:
+  #   image: mariadb:10.8.2
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: searchbiasreport
+
+  #   command: "mysqld --init-file /data/application/init.sql"
+  #   volumes:
+  #     - mariadb-data:/var/lib/mysql
+  #     - ./db_init/init.sql:/data/application/init.sql
+
+  #   tty: true
+  #   ports:
+  #     - 33306:3306
+  #   networks:
+  #     - webappnetwork
+
+networks:
+  webappnetwork:
+    driver: bridge
+# volumes:
+#   mariadb-data:
