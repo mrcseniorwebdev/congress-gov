@@ -15,75 +15,86 @@ const fetchCongressData = async (zipCode, devMode = false) => {
     ],
   };
   const browser = await puppeteer.launch(puppeteerConfig);
-  const page = await browser.newPage();
+  try {
+    const page = await browser.newPage();
 
-  await page.setUserAgent(
-    "Mozilla/5.0 (Linux; Android 12; Pixel 4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Mobile Safari/537.36"
-  );
+    let results = []
 
-  console.log('Puppateer Init Complete')
-  console.log('got to zip code page')
-  await page.goto("https://www.congress.gov/members/find-your-member", {
-    waitUntil: "networkidle2",
-    timeout: 90000, // 90 seconds timeout
-  });
-  
-  await page.waitForSelector("#search-widget-input", { timeout: 90000 });
-  await page.type("#search-widget-input", zipCode, { delay: 100 });
-  
-  console.log('entered zip')
-  console.log('go to results page')
-  await Promise.all([
-    page.keyboard.press("Enter"),
-    page.waitForNavigation({ waitUntil: "networkidle2", timeout: 90000 }),
-  ]);
-  console.log('onresults page')
-  
-  console.log('wait for results list')
-  await page.waitForSelector("ol#outputMessages li", { timeout: 90000 });
-  
-  console.log('eval results')
-  const results = await page.$$eval("#outputMessages li.expanded", (reps) => {
-    return reps.map((rep) => {
-      const resultData = {};
-      const repName = rep.querySelector(".result-heading").textContent.trim();
-      const repNameTypeParts = repName.split(" ");
-      resultData["type"] = repNameTypeParts.shift();
-      const nameParts = repNameTypeParts.join(" ").split(",");
-      resultData["name"] = `${nameParts[1].trim()} ${nameParts[0].trim()}`;
+    await page.setUserAgent(
+      "Mozilla/5.0 (Linux; Android 12; Pixel 4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Mobile Safari/537.36"
+    );
 
-      // resultData['name'] = rep.querySelector('.result-heading').textContent.trim();
-
-      const rep_results = rep.querySelectorAll(".result-item");
-      rep_results.forEach((resultItem) => {
-        const member_data =
-          resultItem.querySelectorAll(".member-served li") ?? [];
-        if (member_data.length) {
-          member_data.forEach((data, index) => {
-            if (index === 1) {
-              resultData["phone"] = data.textContent.trim();
-            }
-            if (index === 2) {
-              resultData["contact"] = data.querySelector("a").href;
-            }
-          });
-          return;
-        }
-        const keyElement = resultItem.querySelector("strong");
-        const valueElement = resultItem.querySelector("span");
-
-        if (keyElement && valueElement) {
-          const key = keyElement.textContent.replace(":", "").trim();
-          const value = valueElement.textContent.trim();
-          resultData[key.toLowerCase()] = value;
-        }
-      });
-      return resultData;
+    console.log("Puppateer Init Complete");
+    console.log("got to zip code page");
+    await page.goto("https://www.congress.gov/members/find-your-member", {
+      waitUntil: "networkidle2",
+      timeout: 90000, // 90 seconds timeout
     });
-  });
 
-  await browser.close();
-  console.log('close browser return results')
+    await page.waitForSelector("#search-widget-input", { timeout: 90000 });
+    await page.type("#search-widget-input", zipCode, { delay: 100 });
+
+    console.log("entered zip");
+    console.log("go to results page");
+    await Promise.all([
+      page.keyboard.press("Enter"),
+      page.waitForNavigation({ waitUntil: "networkidle2", timeout: 90000 }),
+    ]);
+    console.log("onresults page");
+
+    console.log("wait for results list");
+    await page.waitForSelector("ol#outputMessages li", { timeout: 90000 });
+
+    console.log("eval results");
+    results = await page.$$eval("#outputMessages li.expanded", (reps) => {
+      return reps.map((rep) => {
+        const resultData = {};
+        const repName = rep.querySelector(".result-heading").textContent.trim();
+        const repNameTypeParts = repName.split(" ");
+        resultData["type"] = repNameTypeParts.shift();
+        const nameParts = repNameTypeParts.join(" ").split(",");
+        resultData["name"] = `${nameParts[1].trim()} ${nameParts[0].trim()}`;
+
+        // resultData['name'] = rep.querySelector('.result-heading').textContent.trim();
+
+        const rep_results = rep.querySelectorAll(".result-item");
+        rep_results.forEach((resultItem) => {
+          const member_data =
+            resultItem.querySelectorAll(".member-served li") ?? [];
+          if (member_data.length) {
+            member_data.forEach((data, index) => {
+              if (index === 1) {
+                resultData["phone"] = data.textContent.trim();
+              }
+              if (index === 2) {
+                resultData["contact"] = data.querySelector("a").href;
+              }
+            });
+            return;
+          }
+          const keyElement = resultItem.querySelector("strong");
+          const valueElement = resultItem.querySelector("span");
+
+          if (keyElement && valueElement) {
+            const key = keyElement.textContent.replace(":", "").trim();
+            const value = valueElement.textContent.trim();
+            resultData[key.toLowerCase()] = value;
+          }
+        });
+        return resultData;
+      });
+    });
+  } catch (e) {
+    console.error('data fetch error', e)
+    results = null
+  }
+  finally{
+    
+    console.log("close browser");
+    await browser.close();
+  }
+
+  console.log("return results");
 
   return results;
 };
@@ -122,6 +133,9 @@ zipRouter.get("/", async (req, res) => {
 
       // Call the fetchCongressData function and get results
       const results = await fetchCongressData(zip, devMode);
+      if(results == null){
+        throw new Error('No results')
+      }
 
       // Cache the response in the database
       await connection.query(
