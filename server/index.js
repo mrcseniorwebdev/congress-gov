@@ -82,6 +82,9 @@ const errorHandler = (error, request, response, next) => {
 app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
-app.listen(PORT, () => {
+
+const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
+
+server.setTimeout(90000); // 90,000 milliseconds = 90 seconds
