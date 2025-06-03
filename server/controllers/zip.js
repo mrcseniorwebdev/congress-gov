@@ -15,10 +15,10 @@ const fetchCongressData = async (zipCode, devMode = false) => {
     ],
   };
   const browser = await puppeteer.launch(puppeteerConfig);
+  let results = []
   try {
     const page = await browser.newPage();
 
-    let results = []
 
     await page.setUserAgent(
       "Mozilla/5.0 (Linux; Android 12; Pixel 4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Mobile Safari/537.36"
