@@ -84,6 +84,7 @@ const fetchCongressData = async (zipCode, devMode = false) => {
         return resultData;
       });
     });
+    console.log({results})
   } catch (e) {
     console.error('data fetch error', e)
     results = null
