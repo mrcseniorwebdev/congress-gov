@@ -6,7 +6,7 @@ services:
       context: ./server
       dockerfile: Dockerfile.dev
     ports:
-      - 3001:3001
+      - 3010:3001
       - 9229:9229
     # volumes:
     #   - ./server:/server
@@ -22,26 +22,26 @@ services:
       # depends_on:
       #   - db
 
-  # db:
-  #   image: mariadb:10.8.2
-  #   restart: always
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: password
-  #     MYSQL_DATABASE: searchbiasreport
+  db:
+    image: mariadb:10.8.2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: congressgovdb
 
-  #   command: "mysqld --init-file /data/application/init.sql"
-  #   volumes:
-  #     - mariadb-data:/var/lib/mysql
-  #     - ./db_init/init.sql:/data/application/init.sql
+    command: "mysqld --init-file /data/application/init.sql"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./db_init/init.sql:/data/application/init.sql
 
-  #   tty: true
-  #   ports:
-  #     - 33306:3306
-  #   networks:
-  #     - webappnetwork
+    tty: true
+    ports:
+      - 33306:3306
+    networks:
+      - webappnetwork
 
 networks:
   webappnetwork:
     driver: bridge
-# volumes:
-#   mariadb-data:
+volumes:
+  mariadb-data:

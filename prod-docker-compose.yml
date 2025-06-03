@@ -17,26 +17,26 @@ services:
     networks:
       - webappnetwork_gov
       - nginx_network
-    # depends_on:
-    #   - db
+    depends_on:
+      - db
 
-  # db:
-  #   image: mariadb
-  #   restart: always
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: password
-  #     MYSQL_DATABASE: searchbiasreport
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: congressgovdb
 
-  #   command: "mysqld --init-file /data/application/init.sql"
-  #   volumes:
-  #     - mariadb-data:/var/lib/mysql
-  #     - ./db_init/init.sql:/data/application/init.sql
+    command: "mysqld --init-file /data/application/init.sql"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./db_init/init.sql:/data/application/init.sql
 
-  #   tty: true
-  #   ports:
-  #     - 33336:3306
-  #   networks:
-  #     - webappnetwork_gov
+    tty: true
+    ports:
+      - 33396:3306
+    networks:
+      - webappnetwork_gov
 
 networks:
   webappnetwork_gov:
@@ -44,5 +44,5 @@ networks:
   nginx_network:
     external: true
 
-# volumes:
-#   mariadb-data:
+volumes:
+  mariadb-data:

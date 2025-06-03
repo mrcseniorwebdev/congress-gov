@@ -16,13 +16,13 @@ const mariaConfig = DEV_MODE
       port: 33306,
       user: "user",
       password: "pass",
-      database: "searchbiasreport",
+      database: "congressgovdb",
     }
   : {
       host: "db",
       user: process.env.MARIA_DB_USER,
       password: process.env.MARIA_DB_PASS,
-      database: "searchbiasreport",
+      database: "congressgovdb",
     };
 
 console.log({ mariaConfig });
@@ -32,14 +32,14 @@ const pool = mariadb.createPool(mariaConfig);
 //   host: "db",
 //   user: process.env.MARIA_DB_USER,
 //   password: process.env.MARIA_DB_PASS,
-//   database: "searchbiasreport",
+//   database: "congressgovdb",
 // });
 // const pool = mariadb.createPool({
 //   host: "localhost",
 //   port: 33306,
 //   user: "user",
 //   password: "pass",
-//   database: "searchbiasreport",
+//   database: "congressgovdb",
 // });
 
 const getConnection = () => {
@@ -66,13 +66,13 @@ module.exports = {
 //         port: 33306,
 //         user: "user",
 //         password: "pass",
-//         database: "searchbiasreport",
+//         database: "congressgovdb",
 //       })
 //     : mariadb.createPool({
 //         host: "db",
 //         user: process.env.MARIA_DB_USER,
 //         password: process.env.MARIA_DB_PASS,
-//         database: "searchbiasreport",
+//         database: "congressgovdb",
 //       });
 
 // create a new connection pool
@@ -80,5 +80,5 @@ module.exports = {
 //     host: 'db',
 //     user: process.env.MARIA_DB_USER,
 //     password: process.env.MARIA_DB_PASS,
-//     database: 'searchbiasreport'
+//     database: 'congressgovdb'
 // })
